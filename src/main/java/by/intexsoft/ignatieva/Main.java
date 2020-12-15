@@ -7,6 +7,13 @@ import java.util.List;
 
 public class Main {
     public static void main(String... args) {
+        List<Directory> allDirs = generateCatalogue();
+        FindDirectoryChildren.fillInChildren(allDirs);
+        allDirs.stream().flatMap(directory -> directory.getChildren().stream())
+                .forEach(System.out::println);
+    }
+
+    public static List<Directory> generateCatalogue() {
         Directory dir1 = new Directory();
         dir1.setId(1);
         dir1.setParentId(0);
@@ -28,10 +35,6 @@ public class Main {
         allDirs.add(dir3);
         allDirs.add(dir4);
         allDirs.add(dir5);
-        allDirs.stream().flatMap(x -> x.getChildren().stream())
-                .forEach(System.out::println);
-        FindDirectoryChildren.fillInChildren(allDirs);
-        allDirs.stream().flatMap(x -> x.getChildren().stream())
-                .forEach(System.out::println);
+        return allDirs;
     }
 }

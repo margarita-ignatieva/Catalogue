@@ -15,15 +15,16 @@ public class FindDirectoryChildren {
             Set<Long> allParentsIds = tempList.stream()
                     .map(Directory::getParentId)
                     .collect(Collectors.toSet());
-            Set<Long> allIds = tempList.stream()
+            Set<Long> childrenIds = tempList.stream()
                     .map(Directory::getId)
                     .collect(Collectors.toSet());
-            allIds.removeAll(allParentsIds);
-            for (Long l : allIds) {
-                Directory ChildDir = findById(tempList, l);
-                Directory parentDir = tempList.get((int) ChildDir.getParentId());
+            childrenIds.removeAll(allParentsIds);
+            for (Long childId : childrenIds) {
+                Directory ChildDir = findById(allDirectories, childId);
+                Directory parentDir = findById(allDirectories, ChildDir.getParentId());
                 List<Directory> children = parentDir.getChildren();
                 children.add(ChildDir);
+                parentDir.setChildren(children);
                 tempList.remove(ChildDir);
             }
         }
