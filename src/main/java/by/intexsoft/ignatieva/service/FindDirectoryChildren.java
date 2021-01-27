@@ -2,37 +2,27 @@ package by.intexsoft.ignatieva.service;
 
 import by.intexsoft.ignatieva.model.Directory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class FindDirectoryChildren {
-    public static void fillInChildren(List<Directory> allDirectories) {
-        List<Directory> tempList = new ArrayList<>();
-        tempList.addAll(allDirectories);
-        while (tempList.size() > 1) {
-            Set<Long> allParentsIds = tempList.stream()
-                    .map(Directory::getParentId)
-                    .collect(Collectors.toSet());
-            Set<Long> childrenIds = tempList.stream()
-                    .map(Directory::getId)
-                    .collect(Collectors.toSet());
-            childrenIds.removeAll(allParentsIds);
-            for (Long childId : childrenIds) {
-                Directory ChildDir = findById(allDirectories, childId);
-                Directory parentDir = findById(allDirectories, ChildDir.getParentId());
-                List<Directory> children = parentDir.getChildren();
-                children.add(ChildDir);
-                parentDir.setChildren(children);
-                tempList.remove(ChildDir);
+    public static void fillInChildrenDirectories(List<Directory> allDirectories) {
+        Map<Long, List<Directory>> directoriesMap = new HashMap<>();
+        for(Directory directory : allDirectories) {
+            long parentId = directory.getParentId();
+            directoriesMap.put(parentId, findChildrenDirectories(parentId, allDirectories));
+        }
+        for(Directory directory : allDirectories) {
+            if (directoriesMap.containsKey(directory.getId())) {
+                directory.setChildren(directoriesMap.get(directory.getId()));
             }
         }
     }
-    private static Directory findById(List<Directory> allDirectories, Long id) {
-        return allDirectories.stream()
-                .filter(dir -> dir.getId() == id)
-                .findFirst()
-                .get();
+
+
+    private static List<Directory> findChildrenDirectories(Long parentId, List<Directory> allDirectories) {
+        return allDirectories.stream().filter(directory -> directory.getParentId() == parentId)
+                .collect(Collectors.toList());
     }
+
 }
